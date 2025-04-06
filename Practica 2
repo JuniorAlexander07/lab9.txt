@@ -1,0 +1,77 @@
+Instalar:
+sudo apt install terraform
+
+entra como super usuario
+sudo su
+
+sudo mkdir terraform
+cd terraform
+
+ssh-keygen
+
+cd /home/tu usuario/.ssh
+ls
+
+le hacemos un cat a la llave publica:
+cat (llave)
+
+y el contenido que salga lo copiamos 
+
+pegamos la llave en digital ocean
+
+Volvemos a la maquina y volvamos a la carpeta de terraform
+cd terraform
+
+editamos un archivo de configuración con:
+sudo nano main.tf   (tf especifica la extencion de terraform)
+
+aquí vamos a pegar lo siguiente:
+
+terraform {
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "~> 2.0"
+    }
+  }
+}
+
+provider "digitalocean" {
+  token = "token"
+}
+
+# practice
+resource "digitalocean_droplet" "OS3VM" {
+  image  = "ubuntu-22-04-x64"
+  name   = "OS3VM"
+  region = "nyc1"
+  size   = "s-1vcpu-1gb"
+  ssh_keys = ["llave"]
+}
+
+Guardar y salir
+
+Ahora vamos a iniciar el terraform:
+terraform init
+
+ahora verificamos la configuración:
+terraform validate
+
+ahora pondremos:
+terraform plan 
+
+ahora aplicaremos la configuración con:
+terraform apply  
+
+ahora vamos a digital ocean y le damos a first-proyect
+debe salir la maquina que hemos creado
+
+copiamos la ip que tiene
+
+y volvemos a la terminal y hacemos un ssh
+ssh root@157.245.90.100
+
+y deberíamos de entrar a la maquina via ssh
+
+si no entra prueba con
+ssh -i /root/terraform/id_ed25519 root@157.245.90.100
