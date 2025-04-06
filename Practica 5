@@ -1,0 +1,54 @@
+Entramos como usuario root
+sudo su
+
+y vamos a crear un archivo
+nano install_notepad.yml
+
+dentro vamos a pegar lo siguiente:
+
+- name: Descargar e instalar Notepad++ en Windows 10
+  hosts: win
+  tasks:
+
+    - name: Descargar instalador de Notepad++
+      win_get_url:
+        url: https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.5.3/npp.8.5.3.Installer.x64.exe
+        dest: C:\Users\alexander02\Downloads\npp_installer.exe
+        timeout: 120  # Timeout extendido a 120 segundos
+
+    - name: Ejecutar el instalador de Notepad++
+      win_package:
+        path: C:\Users\alexander02\Downloads\npp_installer.exe
+        arguments: /S
+        state: present
+
+guardar y salir
+
+ahora vamos a ejecutarlo con:
+ansible-playbook install_notepad.yml
+
+ahora vamos a nuestra maquina Windows 
+ponemos Notepad++ en el buscador 
+
+e instalamos la app
+
+ahora vamos a crear un archivo en Linux 
+nano up_repos.yml
+
+dentro pegamos lo siguiente
+
+- name: Actualizar los repositorios del sistema
+  hosts: linux
+  become: yes
+  tasks:
+    - name: Actualizar la lista de paquetes
+      apt:
+        update_cache: yes
+
+guardamos y salimos
+
+ahora vamos a ejecutarlo con:
+ansible-playbook up_repos.yml
+
+en caso de que no entre intentalo con:
+ansible-playbook up_repos.yml -i /etc/ansible/hosts --private-key=/home/tu usuario/.ssh/id_rsa --ask-become-pass
