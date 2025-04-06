@@ -1,0 +1,43 @@
+Instalar webmin:
+
+Primero actualizamos nuestros repositorios
+sudo apt update
+
+luego nos aseguramos que las herramientas curl y gnupg estén instaladas:
+sudo apt install curl gnupg -y
+
+agregaremos el repositorio:
+curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
+
+y ejecutamos el script:
+sudo sh setup-repos.sh
+
+volvemos a actualizar los repositorios:
+sudo apt update
+
+permitimos el acceso al puerto 10000 con ufw:
+sudo ufw allow 10000
+
+instalamos webmin con el siguiente comando:
+sudo apt install --install-recommends webmin usermin -y
+
+verificamos el estado de webmin y lo hacemos correr con:
+sudo systemctl start webmin
+sudo systemctl status webmin
+
+entramos a un navegador y ponemos lo siguiente:
+https://localhost:10000/
+
+ya dentro de webmin las credenciales son el usuario root
+
+usuario root
+contraseña de tu maquina linux
+
+si no te deja cambia la contraseña root
+entra como usuario root
+sudo su
+luego pon:
+passwd: (introduce tu nueva contraseña root)
+confirmala
+
+ahora vuelve a webmin
