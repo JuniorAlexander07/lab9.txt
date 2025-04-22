@@ -1,0 +1,170 @@
+requisitos:
+
+Necesitas una maquina Windows 10, un servidor Linux y la VM de digital ocean (la maquina de digital ocean es otra maquina linux conectada por ssh a digital ocean)
+ssh root@157.245.90.100               ip de la maquina de digitalOcean
+si lo quieres hacer directamente sin ssh entonces crea una maquina virtual en digital ocean y abre su terminal
+
+Instalamos ansible en la maquina Linux
+sudo apt install ansible -y
+
+instalamos pyhton3:
+sudo apt install python3-pip -y
+
+vamos a crear un directorio en etc:
+sudo mkdir /etc/ansible/
+cd /etc/ansible/
+
+ahora vamos a crear un archivo .cfg
+sudo nano ansible.cfg
+
+dentro estará vacio ponemos lo siguiente:
+
+[defaults]
+inventory = /etc/ansible/hosts
+private_key_file = /home/alexander/.ssh/id_rsa
+host_key_checking = False
+ask_become_pass = True
+
+[ssh_connection]
+ssh_args = -o ForwardAgent=yes -o ControlMaster=auto -o ControlPersist=60s
+
+guardar y salir
+
+ahora vamos a crear el archivo hosts:
+sudo nano hosts
+
+pegamos lo siguiente:
+
+[win]
+192.168.100.138                                        #la ip de windows 10, ve al cmd para verificar su ip
+[win:vars]
+ansible_user=ansible
+ansible_password=alexander                  #contraseña para el usuario ansible, importante
+ansible_port=5985
+ansible_connection=winrm
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+
+[linux]
+157.245.90.100                                              #ip de la maquina virtual de digital ocean
+[linux:vars]
+ansible_user=ansible
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+ansible_become_password=alexander                      #pones tu nombre de usuario
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+guardar y salir
+
+salimos del directorio para entrar al directorio .ssh
+cd 
+cd .shh
+
+ahora vamos a generar un par de llaves
+ssh-keygen -t rsa -b 4098
+
+le damos un cat a la llave publica:
+cat id_rsa.pub
+copiamos el contenido 
+y dejamos la maquina así y vamos a la otra
+
+vamos a la maquina de digital ocean:
+y vamos a crear el usuario ansible:
+adduser ansible 
+contraseña del usuario: 12345
+
+vamos a agregar el usuario ansible al grupo sudo:
+usermod -aG sudo ansible
+
+vamos a crear el siguiente directorio en la siguiente ruta:
+mkdir /home/ansible/.ssh
+
+vamos a crear el archivo authorized keys:
+touch /home/ansible/.ssh/authorized_keys
+
+para verificar si ya se creo el directorio .ssh
+ls -la
+
+vamos a dirigirnos a la siguiente ruta:
+cd /home/ansible/.ssh
+
+ahora entramos al archivo authorized keys para pegar la llave:
+nano authorized_keys
+
+si hay algo dentro lo borramos todo y pegamos solo la llave que copiamos
+
+guardamos y salimos
+para verificar la ip de la maquina digital ocean
+ip a
+
+ahora usamos ssh en la maquina Linux solo para verificar:
+ssh ansible@157.245.90.100        
+ exit
+
+si no entra ve a la maquina de digital ocean y dale permisos a lo siguiente:
+sudo chmod 600 authorized_keys
+sudo chown ansible:ansible authorized_keys
+(ahora Vuelve intentar ssh)
+
+ahora vamos a comprobar la conexión entre estas dos maquina con el siguiente comando:
+ansible -i /etc/ansible/hosts linux -m ping 
+
+esperamos a que de ping pong es normal que se tarde mucho en dar respuesta
+
+vamos a windows y vamos al buscador de Windows y buscamos configuración y vamos a “red e internet” luego vamos a estado y le damos a propiedades en nuestro adaptador de red ethernet0 y por ultimo ponemos nuestra tarjeta de red en privada
+
+ahora vamos a nuestro powershell
+(buscalo desde el mismo buscador de Windows) y ejecútalo como administrador.
+
+Dentro de powershell ejecutaremos lo siguiente: (asegúrate que el teclado de Windows este en ingles y desde edit y paste en vmware vamos a pegar los comandos):
+
+Habilitar la ejecución de scripts firmados localmente:
+Set-ExecutionPolicy RemoteSigned -Force
+
+Habilitar PowerShell Remoting:
+Enable-PSRemoting -Force
+
+Configurar autenticación básica en WinRM:
+Set-Item WSMan:\localhost\Service\Auth\Basic -Value $true
+Set-Item WSMan:\localhost\Service\AllowUnencrypted -Value $true
+
+Reiniciar el servicio WinRM:
+Restart-Service WinRM
+
+Instalar el módulo de Windows Update:
+Install-Module -Name PSWindowsUpdate -Force
+Le ponemos y o s   para confirmar dependiendo el idioma decir ¨si¨
+
+Si te da errores pon los siguientes comandos para solucionarlo:
+Register-PSRepository -Default
+Get-PSRepository
+
+Ahora intentemos instalar nuevamente los módulos con:
+Install-Module -Name PSWindowsUpdate -Force -Scope CurrentUser
+Install-Module -Name PSWindowsUpdate -Force
+Si te pide confirmer algo dile que si
+
+Abrir el puerto 5985 en el firewall:
+New-NetFirewallRule -Name "WinRM HTTP" -Protocol TCP -LocalPort 5985 -Action Allow
+
+Le ponemos displayname: alexander
+
+Crear un usuario local "ansible":
+New-LocalUser -Name "ansible" -Password (ConvertTo-SecureString "alexander" -AsPlainText -Force) -FullName "Ansible User" -Description "Usuario Ansible"
+
+Agregar el usuario "ansible" al grupo de administradores:
+Add-LocalGroupMember -Group "Administradores" -Member "ansible"
+
+Configurar WinRM para escuchar en todas las interfaces:
+winrm create winrm/config/Listener?Address=*+Transport=HTTP
+
+Verificar la configuración del Listener de WinRM:
+winrm enumerate winrm/config/Listener
+
+ahora vamos a la maquina Linux
+
+y vamos a darle ping con:
+ansible -i /etc/ansible/hosts win -m win_ping
+
+deberia de ser exitoso.
