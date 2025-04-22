@@ -1,0 +1,157 @@
+Instalar:
+sudo apt install terraform
+
+vamos a crear un directorio y entrar en el:
+sudo mkdir terraform
+cd terraform
+
+ahora vamos a digital ocean y bajamos hasta abajo donde dice: API new, lo clickeamos
+
+dentro, le damos a generar un token 
+
+le ponemos cualquier nombre al token, le ponemos el día de vencimiento y lo ponemos el full acceso y a generar token.
+
+Copiamos el token y lo pegamos en un documento
+
+Ahora vamos a la maquina virtual y vamos a generar un par de llaves ssh con:
+ssh-keygen -t ed25519
+
+entramos a la carpeta de ssh para ver si están las llaves
+cd /home/alexander/.ssh
+ls
+
+le hacemos un cat a la llave publica:
+cat id_ed25519.pub
+
+y el contenido que salga lo copiamos 
+
+ahora vamos de nuevo a la pagina de digital ocean, vamos a configuración o settings y luego donde dice security 
+
+y le damos agregar ssh keys
+
+pegamos la llave en el cuadro grande y en el pequeño le damos un nombre cualquiera.
+
+Luego abajo aparece lo que creaste copiamos y lo pegamos en un documento
+
+Volvemos a la maquina linux y volvamos a la carpeta de terraform
+cd ..
+cd terraform
+
+editamos un archivo de configuración con:
+sudo nano main.tf                    (tf especifica la extencion de terraform)
+
+
+aquí vamos a pegar lo siguiente:
+
+terraform {
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "~> 2.0"
+    }
+  }
+}
+
+provider "digitalocean" {
+  token = "aqui copias el token que copiaste"
+}
+
+# practice
+resource "digitalocean_droplet" "OS3VM" {
+  image  = "ubuntu-22-04-x64"
+  name   = "OS3VM"
+  region = "nyc1"
+  size   = "s-1vcpu-1gb"
+  ssh_keys = ["aqui la llave que te dio digital ocean"]
+}
+
+Guardar y salir
+
+Ahora vamos a iniciar el terraform:
+terraform init
+
+va a tardar un poco y si al final te da error entra como usuario root
+sudo su
+después vuelve a ejecutar el comando terraform init
+en verde te tiene que decir que se inicio 
+
+ahora verificamos la configuración para ver si es valida:
+terraform validate
+tiene que salir que es valida
+
+ahora pondremos:
+terraform plan 
+
+ahora aplicaremos la configuración con:
+terraform apply  
+le pones yes
+y al final te tiene que decir que se aplico correctamente
+
+ahora vamos a digital ocean y le damos a first-proyect
+debe salir la maquina que hemos creado
+
+copiamos la ip que tiene
+
+y volvemos a la terminal y hacemos un ssh  (el usuario tiene que ser el root)
+ssh root@157.245.90.100               ip de la maquina de digitalOcean
+
+si después de intentar entrar con ssh te sale error con la llave ssh, ejecuta los siguientes comandos como usuario root:
+
+volvamos al directorio raíz y creamos un directorio en el usuario root
+cd ~
+mkdir terraform
+cd terraform
+
+ahora vamos a copiar las llaves que se encuentran en el usuario alexander al usuario root:
+cp /home/alexander/.ssh/id_ed25519 /root/terraform/
+cp /home/alexander/.ssh/id_ed25519.pub /root/terraform/
+
+para verificar que las llaves se copiaron:
+ls
+deberían de aparecer
+
+le damos los permisos necesarios  a los directorios shh y los creamos en el usuario root:
+mkdir -p /root/.ssh
+touch /root/.ssh/authorized_keys
+chmod 700 /root/.ssh
+chmod 600 /root/.ssh/authorized_keys
+
+vamos a copiar el contenido de la llave publica:
+cat /root/terraform/id_ed25519.pub
+lo que salga lo copiamos
+
+ahora vamos a editar el archivo authorized keys:
+nano /root/.ssh/authorized_keys
+
+dentro del archivo vacio pondremos la clave de la llave publica de esta forma:
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICfO8XaWc0ayHXtHmksayjmjR3M9PBn2HyPnbmc/1I8Kv root@157.245.90.100
+
+guardamos y salimos
+
+ahora intenta entrar con:
+ssh -i /root/terraform/id_ed25519 root@157.245.90.100             ip de la maquina ocean
+
+debería de entrar y hasta aquí se termina la practica.
+
+ En caso de que no entre a ssh usa lo siguiente:
+chmod 700 /root/.ssh
+chmod 600 /root/.ssh/authorized_keys
+sudo systemctl restart sshd
+
+verifica el archivo de conf:
+nano /etc/ssh/sshd_config
+
+verifica que estas lineas estén así:
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+Guardar y salir
+
+Habilita el puerto 22 en caso de que este bloqueado
+sudo apt install ufw
+ufw enable
+sudo ufw allow 22/tcp
+sudo ufw status
+
+intenta hacer nuevamente la conexion ssh:
+ssh -i /root/terraform/id_ed25519 root@157.245.90.100
