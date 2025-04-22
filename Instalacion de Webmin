@@ -3,20 +3,30 @@ Instalar webmin:
 Primero actualizamos nuestros repositorios
 sudo apt update
 
+entra como usuario root
+sudo su
+
 luego nos aseguramos que las herramientas curl y gnupg estén instaladas:
 sudo apt install curl gnupg -y
 
-agregaremos el repositorio:
+agregaremos el repositorio oficial de webmin.com y ejecutamos lo siguiente:
 curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
 
 y ejecutamos el script:
 sudo sh setup-repos.sh
+
+se abrirá un proceso de instalación, esperamos a que termine
 
 volvemos a actualizar los repositorios:
 sudo apt update
 
 permitimos el acceso al puerto 10000 con ufw:
 sudo ufw allow 10000
+
+en caso de no tener ufw:
+sudo apt install ufw
+sudo ufw enable
+ahora vuelve a intentar permitir el puerto
 
 instalamos webmin con el siguiente comando:
 sudo apt install --install-recommends webmin usermin -y
@@ -25,19 +35,17 @@ verificamos el estado de webmin y lo hacemos correr con:
 sudo systemctl start webmin
 sudo systemctl status webmin
 
+si nos sale errores en el estado de webmin, pero dice que esta corriendo, no te preocupes no va a entorpecer el uso de webmin, sigue adelante con la practica.
+
 entramos a un navegador y ponemos lo siguiente:
 https://localhost:10000/
 
 ya dentro de webmin las credenciales son el usuario root
 
 usuario root
-contraseña de tu maquina linux
+contraseña KaliLinux
 
-si no te deja cambia la contraseña root
-entra como usuario root
-sudo su
-luego pon:
-passwd: (introduce tu nueva contraseña root)
-confirmala
+si no te deja entrar, cambia la contraseña root, debes estar como usuario root para eso y ejecutar lo siguiente 
+passwd: (nueva contraseña o la misma que tenias anteriormente para que se sobrescriba 
 
-ahora vuelve a webmin
+ahora debería dejarte iniciar sesión en webmin, vuelve a webmin.
