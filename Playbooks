@@ -106,3 +106,7 @@ guardar y salir
 ejecutamos con:
 ansible-playbook create_user_bashtop.yml -i /etc/ansible/hosts --private-key=/home/alexander/.ssh/id_rsa --ask-become-pass
 
+
+en digital ocean cambiarle la contraseña en caso de que become no te deje entrar
+sudo passwd ansible
+
