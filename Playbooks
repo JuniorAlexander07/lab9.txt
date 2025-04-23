@@ -1,3 +1,9 @@
+Requisitos: Maquina Windows 10 y una de kali
+
+Vamos a nuestra maquina Windows y verificamos que no tengamos Notepad en la barra de búsqueda de windows
+
+Ahora vamos a Kali Linux 
+
 Entramos como usuario root
 sudo su
 
@@ -5,7 +11,6 @@ y vamos a crear un archivo
 nano install_notepad.yml
 
 dentro vamos a pegar lo siguiente:
-
 - name: Descargar e instalar Notepad++ en Windows 10
   hosts: win
   tasks:
@@ -20,19 +25,25 @@ dentro vamos a pegar lo siguiente:
       win_package:
         path: C:\Users\alexander02\Downloads\npp_installer.exe
         arguments: /S
-        state: present
+        state: present 
 
 guardar y salir
 
 ahora vamos a ejecutarlo con:
 ansible-playbook install_notepad.yml
 
+se abrirá un proceso de instalación dejamos que se complete
+
 ahora vamos a nuestra maquina Windows 
-ponemos Notepad++ en el buscador 
+ponemos Notepad++ en el buscador de Windows y ejecutamos
 
-e instalamos la app
+si nos sale un mensaje le damos a yes
 
-ahora vamos a crear un archivo en Linux 
+y aquí se terminara de instalar 
+
+vamos a hacer la siguiente practica:
+
+vamos a crear un archivo en Linux en usuario root:
 nano up_repos.yml
 
 dentro pegamos lo siguiente
@@ -50,5 +61,8 @@ guardamos y salimos
 ahora vamos a ejecutarlo con:
 ansible-playbook up_repos.yml
 
-en caso de que no entre intentalo con:
-ansible-playbook up_repos.yml -i /etc/ansible/hosts --private-key=/home/tu usuario/.ssh/id_rsa --ask-become-pass
+en caso de que de error usa este comando:
+
+ansible-playbook up_repos.yml -i /etc/ansible/hosts --private-key=/home/alexander/.ssh/id_rsa --ask-become-pass
+
+deberia de actualizarse todo.
