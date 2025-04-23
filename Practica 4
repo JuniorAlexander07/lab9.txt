@@ -1,8 +1,0 @@
-Ejcutamos el siguiente comando para mover el archivo de desktop a documentos:
-ansible win -i /etc/ansible/hosts -m win_shell -a "Move-Item -Path 'C:/Users/tu usuario/Desktop/adhoc.txt' -Destination 'C:/Users/tu usuario/Documents/'"
-
-ahora vamos a hacer lo siguiente que es hacerle un reboot a la maquina de digital ocean:
-vamos a la maquina Kali y ejecutamos lo siguiente:
-ansible linux -i /etc/ansible/hosts -m reboot --become --private-key=/home/tu usuario/.ssh/id_rsa -u tu usuario --ask-become-pass
-
-psswd ansible (para cambiar la contraseña)

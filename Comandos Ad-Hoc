@@ -1,0 +1,26 @@
+Requisitos: una maquina Windows 10, una de Kali Linux y una de digital ocean (abre una terminal de digital ocean)
+
+Vamos a la maquina Windows y vamos a crear un archivo de texto desde el escritorio de Windows 10 y le ponemos el nombre adhoc o cualquier otro, dentro del archivo puedes poner tu nombre y matricula 
+
+Ahora entra a el explorador de archivos y verifica que no este dentro de documentos.
+
+Ahora vamos a la maquina Kali Linux:
+
+Ejcutamos el siguiente comando para mover el archivo de desktop a documentos:
+ansible win -i /etc/ansible/hosts -m win_shell -a "Move-Item -Path 'C:/Users/alexander02/Desktop/adhoc.txt' -Destination 'C:/Users/alexander02/Documents/'"
+
+una vez se ejecute Vuelve a Windows y verifica que se haya movido a documentos
+
+ahora la segunda parte de la practica:
+
+ahora vamos a hacer lo siguiente que es hacerle un reboot a la maquina de digital ocean:
+
+vamos a la maquina Kali y ejecutamos lo siguiente:
+ansible linux -i /etc/ansible/hosts -m reboot --become --private-key=/home/alexander/.ssh/id_rsa -u alexander --ask-become-pass
+
+nos pedira la contraseña del usuario ansible
+
+ahora vamos a ver como se reinicia 
+
+en caso de que tengamos que cambiarle la contraseña al usuario ansible ve a la maquina de digital ocean y se la cambias con este comando:
+passwd ansible
